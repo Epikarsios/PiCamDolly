@@ -26,27 +26,44 @@ BWD = ("Adafruit_MotorHAT.BACKWARD")
 Fwd = ("   FORWARDS   ")
 Bwd = ("   BACKWARDS   ")
 
+# Function to move forward the number of steps passed
+def ForStep(stepper,numberSteps):
+	for i in range (0,numberSteps):
+		stepper.oneStep(Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.MICROSTEP)
+	
 
+def BackStep(stepper,numberSteps):
+	for i in range (0,numberSteps):
+		stepper.oneStep(Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.MICROSTEP)
+	turnOffMotors()
 
 def ChooseSteps(stepper):
 	AmtSteps = input('How many steps?')
 	WhcWay =raw_input('press f for forwards b for backwards')
 	if WhcWay =="f":
-		direction = FWD
-		WriteLed(Fwd)
-		for i in range(0,AmtSteps):
-			stepper.oneStep(Adafruit_MotorHAT.FORWARD,Adafruit_MotorHAT.MICROSTEP)
-#			stepper.oneStep(direction, Adafruit_MotorHAT.MICROSTEP)
-		turnOffMotors()
+		print ('Moving forward %s steps')% AmtSteps
+		ForStep(stepper,AmtSteps)
 	else:
-		direction = BWD
-		WriteLed(Bwd)
-		print (direction)
-		WriteLed(str(AmtSteps))
-		for i in range(0, AmtSteps):
-			stepper.oneStep(Adafruit_MotorHAT.BACKWARD,Adafruit_MotorHAT.MICROSTEP)
-		print("this is step number %s") %  i 
+		
+		print ('Moving backwars %s steps')% AmtSteps
+		BackStep(stepper, AmtSteps)	
+
+
+def TimeLapse(stepper):
+	ActTime = input('How Long will this take? Enter in minutes Eg. 2 hours = 120')
+	DelayPic = input('How Long inbetween Shots? enter in seconds Eg. 10 min = 600 ')
+	AmtSteps = input('How many steps')
+	NumberPics = (ActTime * 60)/ DelayPic
+	print ('This will take  minutes and create %s shots') % NumberPics
+	for i in range (0,NumberPics):
+		ForStep(stepper,AmtSteps)
+		time.sleep(1)
+		print ('Take pic!')
 		turnOffMotors()
+		time.sleep((DelayPic)-1)
+
+
+
 
 def WriteLed(Message):	
 
@@ -65,5 +82,9 @@ def WriteLed(Message):
 	display.clear()
 	display.write_display()
 
-ChooseSteps(CamMotor)
-turnOffMotors()
+
+
+while True:
+	ChooseSteps(CamMotor)
+	turnOffMotors()
+#TimeLapse(CamMotor)
