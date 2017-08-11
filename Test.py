@@ -19,7 +19,7 @@ def turnOffMotors():
 atexit.register(turnOffMotors)
 
 CamMotor = mh.getStepper(200, 2)  # 200 steps/rev, motor port #1
-CamMotor.setSpeed(60)             # 30 RPM
+CamMotor.setSpeed(30)             # 30 RPM
 #display.begin()
 FWD = ("Adafruit_MotorHAT.FORWARD")
 BWD = ("Adafruit_MotorHAT.BACKWARD")
@@ -28,18 +28,22 @@ Bwd = ("   BACKWARDS   ")
 
 # Function to move forward the number of steps passed
 def ForStep(stepper,numberSteps):
-	for i in range (0,numberSteps):
-		stepper.oneStep(Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.MICROSTEP)
 	
+	stepper.step(numberSteps, Adafruit_MotorHAT.FORWARD,  Adafruit_MotorHAT.MICROSTEP)
+	turnOffMotors()
+
+def InterStepF(stepper, numberSteps):
+	
+	stepper.step(numberSteps, Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.INTERLEAVE)
+	
+def InterStepB(stepper, numberSteps):
+
+	stepper.step(numberSteps, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.INTERLEAVE)
 
 def BackStep(stepper,numberSteps):
-	for i in range (0,numberSteps):
-		stepper.oneStep(Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.MICROSTEP)
+	
+	stepper.step(numberSteps, Adafruit_MotorHAT.BACKWARD, Adafruit_MotorHAT.MICROSTEP)
 	turnOffMotors()
-def InterF(stepper, numbersteps):
-	for i in range (0,numbersteps):
-		stepper.oneStep(Adafruit_MotorHAT.FORWARD, Adafruit_MotorHAT.INTERLEAVE)
-
 
 def ChooseSteps(stepper):
 	AmtSteps = input('How many steps?')
@@ -47,14 +51,17 @@ def ChooseSteps(stepper):
 	if WhcWay =="f":
 		print ('Moving forward %s steps')% AmtSteps
 		ForStep(stepper,AmtSteps)
+		print('sleep 2 sec')
 		time.sleep(2)
-		print('Interstep')
-		InterF(CamMotor, AmtSteps)
+		
+		InterStepF(stepper,AmtSteps)
 	else:
 		
 		print ('Moving backwars %s steps')% AmtSteps
-		BackStep(stepper, AmtSteps)	
-
+		BackStep(stepper, AmtSteps)
+		print ('sleep 2 secs')
+		time.sleep(2)	
+		InterStepB(stepper, AmtSteps)
 
 def TimeLapse(stepper):
 	ActTime = input('How Long will this take? Enter in minutes Eg. 2 hours = 120')
@@ -69,25 +76,6 @@ def TimeLapse(stepper):
 		turnOffMotors()
 		time.sleep((DelayPic)-1)
 
-
-
-
-def WriteLed(Message):	
-
-	Message = "   " + Message + "   "    		
-	pos = 0
-    #Loop for scrolling through title 	
-	for x in range(0,len(Message)-4):
-           
-		display.print_str(Message[pos:pos+4])
-   	     	display.write_display()
-  		pos += 1
-     		if pos > len(Message)-4:
-			pos = 0
-		
-    		time.sleep(0.15)  
-	display.clear()
-	display.write_display()
 
 
 
